@@ -1,0 +1,60 @@
+glossary:
+  highlights_enabled: true
+
+urls:
+  protocol: http
+
+locking:
+  storage: db
+
+errors:
+  display_trace: true
+
+cache:
+  ttl: 10
+
+files:
+  ttl: 600
+  css:
+    minify: true
+    sourcemap: true
+
+images:
+  ttl: 3600
+
+theme:
+  bundle_css: true
+  bundle_js: true
+  head_cache_ttl: 600
+
+user_sources:
+  cas:
+    providers:
+      demo:
+        active: true
+        name: Demo login provider
+        mock_cas_user: true
+
+cron:
+  poor_mans_cron: false
+  route_enabled: true
+  route_time_limit: 2
+  intervals:
+    default: 1 minute
+    frequent: 1 minute
+    email: 1 minute
+    halfhourly: 1 minute
+    hourly: 1 minute
+    daily: 1 minute
+    weekly: 1 minute
+    biweekly: 1 minute
+    monthly: 1 minute
+    index_pages: 1 minute
+    index_plugins: 1 minute
+    maintenance: 1 minute
+    maintenance_heavy: 1 minute
+    wayback: 1 minute
+
+# Allow insecure cookies for demo site
+cookies:
+  secure: false

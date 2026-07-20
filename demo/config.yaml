@@ -1,0 +1,30 @@
+urls:
+  protocol: http
+
+fields:
+  site:
+    name: Glossary plugin dev
+
+# disable email
+email:
+  enabled: false
+
+# display errors in page
+errors:
+  display_trace: true
+
+# show sign in
+usermenu:
+  guest_signin: true
+
+# enable mock CAS for NetID signin
+user_sources:
+  cas:
+    providers:
+      netid:
+        mock_cas_user: true
+
+# really permissive umasks for ease of development
+fs:
+  umask_file: 0
+  umask_dir: 0

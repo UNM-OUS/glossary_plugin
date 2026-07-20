@@ -1,0 +1,10 @@
+/vendor/
+/composer.lock
+/.phpunit.result.cache
+/.phpunit.cache
+/.idea
+
+/demo/storage/
+/demo/cache/
+/demo/files/
+/demo/cron_error.log

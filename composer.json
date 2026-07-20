@@ -1,0 +1,31 @@
+{
+    "name": "unmous/glossary_plugin",
+    "type": "digraph-plugin",
+    "require": {
+        "digraphcms/digraph-core": "^3",
+        "joby/toolbox": "^1.0",
+        "joby/smol-fs": "^1.2",
+        "s9e/regexp-builder": "^2.1"
+    },
+    "require-dev": {
+        "php": ">=8.4",
+        "phpstan/phpstan": "^1.9",
+        "phpunit/phpunit": "^10"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "DigraphCMS_Plugins\\unmous\\glossary\\": "src/"
+        }
+    },
+    "scripts": {
+        "migrate": [
+            "phinx migrate",
+            "DigraphCMS_Plugins\\unmous\\glossary\\Migrator::migrate"
+        ],
+        "seed": [
+            "phinx seed:run"
+        ]
+    }
+}

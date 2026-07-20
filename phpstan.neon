@@ -1,0 +1,7 @@
+parameters:
+  phpVersion: 80400
+  level: 7
+  paths:
+    - src
+    - routes
+    - OUS.php
