@@ -27,14 +27,6 @@ theme:
   bundle_js: true
   head_cache_ttl: 600
 
-user_sources:
-  cas:
-    providers:
-      demo:
-        active: true
-        name: Demo login provider
-        mock_cas_user: true
-
 cron:
   poor_mans_cron: false
   route_enabled: true

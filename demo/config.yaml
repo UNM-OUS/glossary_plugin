@@ -17,11 +17,12 @@ errors:
 usermenu:
   guest_signin: true
 
-# enable mock CAS for NetID signin
 user_sources:
   cas:
     providers:
-      netid:
+      demo:
+        active: true
+        name: Demo login provider
         mock_cas_user: true
 
 # really permissive umasks for ease of development
