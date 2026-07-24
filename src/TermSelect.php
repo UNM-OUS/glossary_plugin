@@ -4,6 +4,10 @@ namespace DigraphCMS_Plugins\unmous\glossary;
 
 use DigraphCMS\DB\AbstractMappedSelect;
 
+/**
+ * Maps DB rows to GlossaryTerm objects
+ * @extends AbstractMappedSelect<GlossaryTerm>
+ */
 class TermSelect extends AbstractMappedSelect
 {
 
@@ -22,5 +26,4 @@ class TermSelect extends AbstractMappedSelect
             $row['global_term'],
         );
     }
-
 }

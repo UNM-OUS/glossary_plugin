@@ -50,26 +50,26 @@ $table = new PaginatedTable(
             ]),
             $term->cardContent(),
             '<div id="patterns-edit--' . $term->uuid() . '" class="navigation-frame navigation-frame--stateless">' .
-            implode('<br>', array_map(
-                function (array $p) use ($term) {
-                    return sprintf(
-                        "%s<code>%s</code>",
-                        (new ToolbarLink(
-                            'Delete',
-                            'delete',
-                            function () use ($term, $p) {
-                                $term->deletePattern($p['pattern']);
-                            },
-                            null,
-                            'delete_' . $term->uuid() . '_' . md5($p['pattern'])
-                        ))->setData('target', '_frame'),
-                        $p['pattern'],
-                    );
-                },
-                $term->patterns()->fetchAll(),
-            ))
-            . $addPatternForm
-            . '</div>'
+                implode('<br>', array_map(
+                    function (array $p) use ($term) {
+                        return sprintf(
+                            "%s<code>%s</code>",
+                            (new ToolbarLink(
+                                'Delete',
+                                'delete',
+                                function () use ($term, $p) {
+                                    $term->deletePattern($p['pattern']);
+                                },
+                                null,
+                                'delete_' . $term->uuid() . '_' . md5($p['pattern'])
+                            ))->setData('target', '_frame'),
+                            $p['pattern'],
+                        );
+                    },
+                    $term->patterns()->fetchAll(), // @phpstan-ignore-line an error here is good
+                ))
+                . $addPatternForm
+                . '</div>'
         ];
     },
     [

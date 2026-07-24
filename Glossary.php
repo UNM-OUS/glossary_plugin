@@ -10,6 +10,7 @@ use DigraphCMS\HTTP\Response;
 use DigraphCMS\Plugins\AbstractPlugin;
 use DigraphCMS\URL\URL;
 use DigraphCMS\Users\User;
+use DOMComment;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -34,6 +35,8 @@ class Glossary extends AbstractPlugin
 
     const GLOSSARY_PAGE_PUBLIC_ROUTES = [];
 
+    protected static bool $parsing_active = false;
+
     public function onPageUrlPermissions(URL $url, User $user): bool|null
     {
         if ($url->actionPrefix() === 'glossary')
@@ -46,7 +49,7 @@ class Glossary extends AbstractPlugin
             return null;
     }
 
-    public function onTemplateWrapResponse(Response $response)
+    public function onTemplateWrapResponse(Response $response): void
     {
         // only run if response is the context response
         if ($response !== Context::response())
@@ -81,11 +84,20 @@ class Glossary extends AbstractPlugin
         );
     }
 
+    /**
+     * Parse the given HTML and replace any glossary terms with links to the glossary
+     *
+     * @param string $html 
+     * @param array<string> $page_uuids 
+     * @param array<string> $term_uuids 
+     * @return string 
+     */
     public static function parseHTML(string $html, array $page_uuids, array $term_uuids): string
     {
         return Cache::get(
             'glossary/html/' . md5(serialize([$html, $page_uuids, $term_uuids])),
             function () use ($html, $page_uuids, $term_uuids) {
+                static::$parsing_active = false;
                 $patterns = static::allPatterns($page_uuids, $term_uuids);
                 if (!$patterns)
                     return $html;
@@ -93,6 +105,7 @@ class Glossary extends AbstractPlugin
                 $fragment = $html5->parseFragment($html);
                 $matched = [];
                 static::parseElement($fragment, $patterns, $matched);
+                static::$parsing_active = false;
                 return $html5->saveHTML($fragment);
             },
             3600,
@@ -112,7 +125,14 @@ class Glossary extends AbstractPlugin
         return $result ? $result : null;
     }
 
-    protected static function parseText(string $text, array $patterns, array &$matched = [])
+    /**
+     * Replace the text within the given element that matches any of the given patterns with the term definitions
+     *
+     * @param string $text 
+     * @param array<array{0:string,1:string}> $patterns 
+     * @param array<string> &$matched 
+     */
+    protected static function parseText(string $text, array $patterns, array &$matched = []): string
     {
         return preg_replace_callback(
             static::completeRegexPattern($patterns),
@@ -144,6 +164,7 @@ class Glossary extends AbstractPlugin
      * Retrieve the terms matching a given string
      *
      * @param string $term
+     * @param array<array{0:string,1:string}> $patterns
      * @return GlossaryTerm[]
      */
     protected static function matchingTerms(string $term, array $patterns): array
@@ -217,12 +238,12 @@ class Glossary extends AbstractPlugin
                      * @return array{0:string,1:string}
                      */
                     function ($row): array {
-                    return [
-                        $row['pattern'],
-                        $row['glossary_term_uuid'],
-                    ];
-                },
-                    $query->fetchAll(),
+                        return [
+                            $row['pattern'],
+                            $row['glossary_term_uuid'],
+                        ];
+                    },
+                    $query->fetchAll() // @phpstan-ignore-line an error here is good
                 );
                 // sort by length
                 usort(
@@ -232,8 +253,8 @@ class Glossary extends AbstractPlugin
                      * @param  array{0:string,1:string} $b
                      */
                     function (array $a, array $b): int {
-                    return strlen($b[0]) - strlen($a[0]);
-                }
+                        return strlen($b[0]) - strlen($a[0]);
+                    }
                 );
                 // return
                 return $patterns;
@@ -244,8 +265,9 @@ class Glossary extends AbstractPlugin
 
     /**
      * @param array<array{0:string,1:string}> $patterns
+     * @param array<string> &$matched
      */
-    public static function parseElement(DOMNode $element, array $patterns, array &$matched = [])
+    public static function parseElement(DOMNode $element, array $patterns, array &$matched = []): void
     {
         // do nothing if config disables glossary highlighting
         if (!Config::get('glossary.highlights_enabled'))
@@ -258,8 +280,7 @@ class Glossary extends AbstractPlugin
                 $newChild->appendXML($newText);
                 $element->parentNode->replaceChild($newChild, $element);
             }
-        }
-        elseif ($element instanceof DOMElement) {
+        } elseif ($element instanceof DOMElement) {
             // allow data-no-glossary attribute to skip glossary searching in an element
             if ($element->getAttribute('data-no-glossary'))
                 return;
@@ -273,6 +294,14 @@ class Glossary extends AbstractPlugin
             $classes = explode(' ', $element->getAttribute('class'));
             if (array_intersect($classes, ['form-wrapper', 'form-field', 'menubar', 'notification']))
                 return;
+        } elseif ($element instanceof DOMComment) {
+            // allow using comments to start/stop glossary highlighting
+            $text = trim(strtolower($element->textContent));
+            if ($text == 'glossary_highlight_start')
+                static::$parsing_active = true;
+            elseif ($text == 'glossary_highlight_end')
+                static::$parsing_active = false;
+            return;
         }
         // recurse if possible
         if ($element->hasChildNodes()) {
@@ -286,5 +315,4 @@ class Glossary extends AbstractPlugin
             }
         }
     }
-
 }

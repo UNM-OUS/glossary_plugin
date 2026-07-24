@@ -1,6 +1,7 @@
 <h1>Link outside glossary terms to this page</h1>
 <?php
 
+use DigraphCMS\Content\AbstractPage;
 use DigraphCMS\Content\Pages;
 use DigraphCMS\Context;
 use DigraphCMS\HTML\Forms\Field;
@@ -14,6 +15,7 @@ use DigraphCMS\UI\Notifications;
 use DigraphCMS\URL\URL;
 use DigraphCMS_Plugins\unmous\glossary\Glossary;
 
+/** @var AbstractPage $current_page */
 $current_page = Context::page();
 $current_step = Context::arg_string('step', true);
 
@@ -29,8 +31,7 @@ if (is_null($current_step)) {
         throw new RedirectException(new URL('?step=pick&page=' . $page_field->value()));
     }
     echo $add_page;
-}
-elseif ($current_step == 'pick' && $page = Pages::get(Context::arg_string('page'))) {
+} elseif ($current_step == 'pick' && $page = Pages::get(Context::arg_string('page'))) {
     // step two is to either add all terms from this page, or select the ones to add
     echo '<h2>Select terms to add from ' . $page->name() . '</h2>';
     $add_all = new CallbackLink(
@@ -49,8 +50,7 @@ elseif ($current_step == 'pick' && $page = Pages::get(Context::arg_string('page'
         ->order('name ASC');
     if ($terms->count() === 0) {
         Notifications::printNotice("This page currently has no glossary terms defined");
-    }
-    else {
+    } else {
         $select_form = new FormWrapper();
         $select_form->button()->setText("Link selected terms");
         $options = [];
@@ -70,7 +70,6 @@ elseif ($current_step == 'pick' && $page = Pages::get(Context::arg_string('page'
         }
         echo $select_form;
     }
-}
-else {
+} else {
     throw new HttpError(404);
 }

@@ -16,23 +16,23 @@ use Envms\FluentPDO\Queries\Select;
 class GlossaryTerm
 {
 
-    protected $uuid;
+    protected string $uuid;
 
-    protected $page_uuid;
+    protected string $page_uuid;
 
-    protected $name;
+    protected string $name;
 
-    protected $link;
+    protected string $link;
 
-    protected $body;
+    protected string $body;
 
-    protected $created;
+    protected int $created;
 
-    protected $created_by;
+    protected string $created_by;
 
-    protected $updated;
+    protected int $updated;
 
-    protected $updated_by;
+    protected string $updated_by;
 
     protected bool $global_term;
 
@@ -43,12 +43,11 @@ class GlossaryTerm
         string|null $link = null,
         int|null $created = null,
         string|null $created_by = null,
-        string|null $updated = null,
+        int|null $updated = null,
         string|null $updated_by = null,
         string|null $uuid = null,
         bool $global_term = false,
-    )
-    {
+    ) {
         $this->name = $name;
         $this->uuid = $uuid ?? Digraph::uuid();
         $this->page_uuid = $page_uuid;
@@ -133,7 +132,7 @@ class GlossaryTerm
         return $this;
     }
 
-    public function delete()
+    public function delete(): void
     {
         DB::beginTransaction();
         DB::query()->delete('glossary_pattern')
@@ -230,5 +229,4 @@ class GlossaryTerm
     {
         return (new DateTime)->setTimestamp($this->updated);
     }
-
 }

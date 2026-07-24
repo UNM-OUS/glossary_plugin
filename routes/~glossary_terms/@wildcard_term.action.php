@@ -22,6 +22,7 @@ $terms = array_map(
     fn(string $uuid): GlossaryTerm => Glossary::get($uuid) ?? throw new HttpError(404),
     $terms,
 );
+$terms = array_filter($terms);
 
 if (!$terms)
     throw new HttpError(404);

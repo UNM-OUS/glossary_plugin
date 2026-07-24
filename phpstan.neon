@@ -4,4 +4,4 @@ parameters:
   paths:
     - src
     - routes
-    - OUS.php
+    - Glossary.php
